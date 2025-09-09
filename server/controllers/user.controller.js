@@ -2,6 +2,7 @@ import userModel from "../models/user.model.js";
 import { validationResult } from "express-validator";
 import jwt from 'jsonwebtoken'
 import balckListModel from "../models/blackList.model.js";
+import chatModel from "../models/chat.model.js";
 
 // api to register to user
 export const registerUser=async(req,res)=>{
@@ -108,6 +109,32 @@ export const logoutUser=async(req,res)=>{
     await balckListModel.create({token});
     res.json({ success: true, message: "Logged out successfully" });
 
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({success:false,message:error.message});
+  }
+}
+
+// API to get published images
+export const getPublishedImages=async(req,res)=>{
+  try {
+    const publishedImageMessages=await chatModel.aggregate([
+      {$unwind:"$messages"},
+      {
+        $match:{
+          "messages.isImage":true,
+          "messages.isPublished":true
+        }
+      },
+      {
+        $project:{
+          _id:0,
+          imageUrl:"$messages.content",
+          userName:"$userName",
+        }
+      }
+    ])
+    res.status(201).json({success:true,images:publishedImageMessages.reverse()});
   } catch (error) {
     console.log(error);
     res.status(500).json({success:false,message:error.message});

@@ -5,6 +5,8 @@ import connectDB from './configs/db.config.js';
 import userRouter from './routes/user.route.js';
 import chatRouter from './routes/chat.route.js';
 import messageRouter from './routes/message.route.js';
+import creditRouter from './routes/credit.route.js';
+import { stripeWebhooks } from './controllers/webhooks.controller.js';
 const app = express();
 
 // middlewares
@@ -17,6 +19,10 @@ app.use(cors());
 connectDB();
 
 
+// stripe webhooks
+app.post('/api/stripe',express.raw({type:'application/json'}),
+stripeWebhooks);
+
 // test route
 app.get("/", (req, res) => {
   res.send('Server is Live!');
@@ -26,5 +32,6 @@ app.get("/", (req, res) => {
 app.use('/api/user',userRouter);
 app.use('/api/chat',chatRouter);
 app.use('/api/message',messageRouter);
+app.use('/api/credit',creditRouter);
 
 export default app;

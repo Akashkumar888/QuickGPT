@@ -1,5 +1,5 @@
 import express from 'express'
-import {  getUser, loginUser, logoutUser, registerUser } from '../controllers/user.controller.js';
+import {  getPublishedImages, getUser, loginUser, logoutUser, registerUser } from '../controllers/user.controller.js';
 const userRouter=express.Router();
 import {body} from 'express-validator';
 import { authUser } from '../middlewares/auth.middleware.js';
@@ -18,6 +18,6 @@ userRouter.post("/login",[
 
 userRouter.get("/data",authUser,getUser);
 userRouter.post("/logout",authUser,logoutUser);
-
+userRouter.get("/published-images",getPublishedImages);
 
 export default userRouter;
