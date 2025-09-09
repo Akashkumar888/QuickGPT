@@ -15,6 +15,7 @@ export const stripeWebhooks=async(req,res)=>{
   }
   
   try {
+    console.log("Received event:", event.type);
     if(event.type==="payment_intent.succeeded"){
     const paymentIntent=event.data.object;
     const sessionList=await stripeInstance.checkout.sessions.list({

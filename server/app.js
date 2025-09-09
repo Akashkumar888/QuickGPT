@@ -9,10 +9,6 @@ import creditRouter from './routes/credit.route.js';
 import { stripeWebhooks } from './controllers/webhooks.controller.js';
 const app = express();
 
-// middlewares
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors());
 
 
 //Database connection
@@ -22,6 +18,12 @@ connectDB();
 // stripe webhooks
 app.post('/api/stripe',express.raw({type:'application/json'}),
 stripeWebhooks);
+
+
+// middlewares
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 // test route
 app.get("/", (req, res) => {
