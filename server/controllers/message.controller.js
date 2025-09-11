@@ -52,7 +52,7 @@ export const textMessageController=async(req,res)=>{
 
 
 
-image generation message controller using ai 
+// image generation message controller using ai 
 export const imageMessageController=async(req,res)=>{
   try {
     const userId=req.user._id;
