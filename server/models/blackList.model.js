@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 // using ttl-> time to live 
-const balckListSchema=new mongoose.Schema({
+const blackListSchema=new mongoose.Schema({
   token:{
     type:String,
     required:true,
@@ -9,10 +9,10 @@ const balckListSchema=new mongoose.Schema({
   createdAt:{
     type:Date,
     default:Date.now(),
-    expires:7*86400,
+    expires:30*86400,
   }
 })
 
-const balckListModel=mongoose.models.BlackList || mongoose.model('BlackList',balckListSchema);
+const blackListModel=mongoose.models.BlackList || mongoose.model('BlackList',blackListSchema);
 
-export default balckListModel;
+export default blackListModel;

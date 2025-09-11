@@ -2,13 +2,15 @@ import React, { useEffect, useRef, useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import { assets } from "../assets/assets";
 import Message from "./Message";
+import { toast } from "react-toastify";
+import api from "../api/axios";
 
 const ChatBox = () => {
   //   ✅ Rule of Thumb in React
   // If you want React to call a function on an event → pass the function reference (onClick={fn}).
   // If you want to run a function immediately during render → call it (fn()).
 
-  const { selectedChat, theme } = useAppContext();
+  const { selectedChat, theme, user,token,setUser } = useAppContext();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [prompt, setPrompt] = useState("");
@@ -16,19 +18,49 @@ const ChatBox = () => {
   const [isPublished, setIsPublished] = useState(false);
   const containerRef = useRef(null);
 
-  const onSubmit = (e) => {
-    e.preventDefault();
+  const onSubmit =async (e) => {
+    try {
+      e.preventDefault();
+      if(!user)return toast("Login to send message");
+      setLoading(true);
+      const promptCopy=prompt;
+      setPrompt("");
+      setMessages(prev=> [...prev,{role:"user",content:prompt,timestamp:Date.now(),isImage:false}])
+      const {data}=await api.post(`/api/message/${mode}`,{chatId:selectedChat._id,prompt,isPublished},{
+        headers:{
+          Authorization:`Bearer ${token}`
+        }
+      });
+      if(data.success){
+        setMessages(prev => [...prev,data.reply]);
+        // decrease credits
+        if(mode==='image'){
+          setUser(prev => ({...prev,credits:prev.credits-2}));
+        }
+        else{
+          setUser(prev => ({...prev,credits:prev.credits-1}));
+        }
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }finally{
+      setPrompt("");
+      setLoading(false);
+    }
   };
 
   const fetchMessage = () => {
-    setMessages(dummyMe);
+    
   };
+
 
   useEffect(() => {
     if (selectedChat) {
       setMessages(selectedChat.messages);
     }
   }, [selectedChat]);
+
+
 
   useEffect(() => {
     if (containerRef.current) {
@@ -39,6 +71,7 @@ const ChatBox = () => {
     }
   }, [messages]);
 
+  
   return (
     <div className="flex flex-1 flex-col justify-between m-5 md:m-10 xl:mx-30 max-md:mt-14 2xl:pr-40">
       {/* chat Message  */}
@@ -86,7 +119,7 @@ const ChatBox = () => {
       {/* If your handler needs only the event, use: */}
       <form
         onSubmit={onSubmit}
-        className="bg-primary/20 darj:bg-[#583C79]/30 border border-primary dark:border-[#80609F]/30 rounded-full w-full max-w-2xl p-3 pl-4 mx-auto flex gap-4 items-center"
+        className="bg-primary/20 dark:bg-[#583C79]/30 border border-primary dark:border-[#80609F]/30 rounded-full w-full max-w-2xl p-3 pl-4 mx-auto flex gap-4 items-center"
       >
         <select
           onChange={(e) => setMode(e.target.value)}

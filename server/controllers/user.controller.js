@@ -1,7 +1,7 @@
 import userModel from "../models/user.model.js";
 import { validationResult } from "express-validator";
 import jwt from 'jsonwebtoken'
-import balckListModel from "../models/blackList.model.js";
+import blackListModel from "../models/blackList.model.js";
 import chatModel from "../models/chat.model.js";
 
 // api to register to user
@@ -106,7 +106,7 @@ export const logoutUser=async(req,res)=>{
     }
     const token=authHeader.split(" ")[1];
     if(!token)return res.status(401).json({success:false,message:"Token Not found"});
-    await balckListModel.create({token});
+    await blackListModel.create({token});
     res.json({ success: true, message: "Logged out successfully" });
 
   } catch (error) {
@@ -114,6 +114,7 @@ export const logoutUser=async(req,res)=>{
     res.status(500).json({success:false,message:error.message});
   }
 }
+
 
 // API to get published images
 export const getPublishedImages=async(req,res)=>{

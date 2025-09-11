@@ -43,15 +43,43 @@ export const AppContextProvider=({children})=>{
 
   const createNewChat=async()=>{
     try {
-      
+      if(!user)return toast("Login to create a new chat.");
+      navigate("/");
+      await api.get("/api/chat/create",{
+        headers:{
+          Authorization:`Bearer ${token}`
+        }
+      });
+      await fetchUserChats();
     } catch (error) {
-      
+      toast.error(error.message);
     }
   }
 
   const fetchUserChats=async()=>{
-      setChats(dummyChats);
-      setSelectedChat(dummyChats[0]);
+      try {
+        const {data}=await api.get("/api/chat/get",{
+          headers:{
+            Authorization:`Bearer ${token}`
+          }
+        })
+        if(data.success){
+          setChats(data.chats);
+          // if the user has no chats, create one
+          if(data.chats.length===0){
+            await createNewChat();
+            return fetchUserChats();
+          }
+          else{
+             setSelectedChat(data.chats[0]);
+          }
+        }
+        else {
+          toast.error(data.message);
+        }
+      } catch (error) {
+        toast.error(error.message);
+      }
   }
 
   useEffect(()=>{
@@ -64,6 +92,7 @@ export const AppContextProvider=({children})=>{
   localStorage.setItem('theme',theme);
   },[theme])
 
+
   useEffect(()=>{
    if(user){
     fetchUserChats();
@@ -74,9 +103,16 @@ export const AppContextProvider=({children})=>{
    }
   },[user])
 
+
   useEffect(()=>{
-    fetchUser();
-  },[])
+    if(token){
+      fetchUser();
+    }
+    else {
+      setUser(null);
+      setLoadingUser(false);
+    }
+  },[token])
   
 
   const value={
@@ -89,7 +125,12 @@ export const AppContextProvider=({children})=>{
     selectedChat,
     setSelectedChat,
     theme,
-    setTheme
+    setTheme,
+    createNewChat,
+    loadingUser,
+    fetchUserChats,
+    token,
+    setToken,
   };
 
   return (

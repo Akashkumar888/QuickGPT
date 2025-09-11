@@ -1,4 +1,4 @@
-import balckListModel from "../models/blackList.model.js";
+import blackListModel from "../models/blackList.model.js";
 import userModel from "../models/user.model.js";
 import jwt from 'jsonwebtoken'
 
@@ -9,12 +9,12 @@ export const authUser=async(req,res,next)=>{
       return res.status(401).json({success:false,message:"Not authorized"});
     }
     const token=authHeader.split(" ")[1];
-    const isBlackListToken=await balckListModel.findOne({token});
+    const isBlackListToken=await blackListModel.findOne({token});
     if(isBlackListToken){
       return res.status(400).json({success:false,message:"token is expired"});
     }
     const decoded=jwt.verify(token,process.env.JWT_SECRET_KEY);
-    const userId=decoded._id;
+    const userId = decoded._id || decoded.id;
     
     const user=await userModel.findById(userId);
     if(!user)return res.status(401).json({ success: false, message: "User not found." });
