@@ -6,7 +6,6 @@ import userRouter from './routes/user.route.js';
 import chatRouter from './routes/chat.route.js';
 import messageRouter from './routes/message.route.js';
 import creditRouter from './routes/credit.route.js';
-import { stripeWebhooks } from './controllers/webhooks.controller.js';
 const app = express();
 
 
@@ -15,9 +14,6 @@ const app = express();
 connectDB();
 
 
-// stripe webhooks
-app.post('/api/stripe',express.raw({type:'application/json'}),
-stripeWebhooks);
 
 
 // middlewares
